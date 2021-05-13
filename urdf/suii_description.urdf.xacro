@@ -1,0 +1,23 @@
+<robot xmlns:xacro="http://ros.org/wiki/xacro"
+       name="suii" >
+
+  <!-- base -->
+  <xacro:include filename="$(find suii_manipulation)/urdf/suii_base.urdf.xacro" />
+
+  <!-- ur3 -->
+  <xacro:include filename="$(find ur_description)/urdf/ur.urdf.xacro"/>
+
+
+  <joint name="ur3_mount" type="fixed">
+    <parent link="arm_placeholder" />
+    <child link="ur3/base_link" />
+    <origin xyz="0.0 0.0 0.0207767" rpy="0 0 ${-pi/2.0}" />
+  </joint>
+
+
+
+  <xacro:suii_base/>
+  <!--<xacro:ur_robot parent="arm_placeholder" prefix="ur3/" joint_limited="false">
+    <origin xyz="0.0 0.0 0.0207767" rpy="0.0 0.0 -1.5707963267949" />
+    </xacro:ur_robot>-->
+</robot>
