@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.5)
 project(suii_manipulation)
 
+find_package(moveit_common REQUIRED)
+moveit_package()
+
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
   set(CMAKE_C_STANDARD 99)
@@ -17,9 +20,19 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-# uncomment the following section in order to fill in
-# further dependencies manually.
-# find_package(<dependency> REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(moveit_common REQUIRED)
+find_package(moveit_ros_planning_interface REQUIRED)
+find_package(rosidl_default_runtime REQUIRED)
+find_package(Boost REQUIRED COMPONENTS system)
+
+add_executable(manipulation src/manipulation.cpp)
+ament_target_dependencies(manipulation rclcpp moveit_ros_planning_interface Boost)
+
+install(TARGETS
+  manipulation
+  DESTINATION lib/${PROJECT_NAME}
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -35,6 +48,7 @@ endif()
 install(DIRECTORY
   launch
   urdf
+  srdf
   meshes
   rviz
   config

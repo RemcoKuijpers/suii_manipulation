@@ -36,19 +36,19 @@ force_torque_sensor_broadcaster:
       - torque.x
       - torque.y
       - torque.z
-    frame_id: tool0
+    frame_id: ur3/tool0
     topic_name: ft_data
 
 
 joint_trajectory_controller:
   ros__parameters:
     joints:
-      - shoulder_pan_joint
-      - shoulder_lift_joint
-      - elbow_joint
-      - wrist_1_joint
-      - wrist_2_joint
-      - wrist_3_joint
+      - ur3/shoulder_pan_joint
+      - ur3/shoulder_lift_joint
+      - ur3/elbow_joint
+      - ur3/wrist_1_joint
+      - ur3/wrist_2_joint
+      - ur3/wrist_3_joint
     state_publish_rate: 100.0
     action_monitor_rate: 20.0
     allow_partial_joints_goal: false
@@ -60,12 +60,12 @@ joint_trajectory_controller:
 scaled_joint_trajectory_controller:
   ros__parameters:
     joints:
-      - shoulder_pan_joint
-      - shoulder_lift_joint
-      - elbow_joint
-      - wrist_1_joint
-      - wrist_2_joint
-      - wrist_3_joint
+      - ur3/shoulder_pan_joint
+      - ur3/shoulder_lift_joint
+      - ur3/elbow_joint
+      - ur3/wrist_1_joint
+      - ur3/wrist_2_joint
+      - ur3/wrist_3_joint
     state_publish_rate: 100.0
     action_monitor_rate: 20.0
     allow_partial_joints_goal: false
