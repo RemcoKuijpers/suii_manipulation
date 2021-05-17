@@ -124,25 +124,25 @@ def generate_launch_description():
   launch_rviz = "false"
 
   joint_limit_params = PathJoinSubstitution(
-      [FindPackageShare("ur_description"), "config", ur_type, "joint_limits.yaml"]
+      [FindPackageShare("suii_manipulation"), "config", "joint_limits.yaml"]
   )
   kinematics_params = PathJoinSubstitution(
-      [FindPackageShare("ur_description"), "config", ur_type, "default_kinematics.yaml"]
+      [FindPackageShare("suii_manipulation"), "config", "default_kinematics.yaml"]
   )
   physical_params = PathJoinSubstitution(
-      [FindPackageShare("ur_description"), "config", ur_type, "physical_parameters.yaml"]
+      [FindPackageShare("suii_manipulation"), "config", "physical_parameters.yaml"]
   )
   visual_params = PathJoinSubstitution(
-      [FindPackageShare("ur_description"), "config", ur_type, "visual_parameters.yaml"]
+      [FindPackageShare("suii_manipulation"), "config", "visual_parameters.yaml"]
   )
   script_filename = PathJoinSubstitution(
-      [FindPackageShare("ur_robot_driver"), "resources", "ros_control.urscript"]
+      [FindPackageShare("suii_manipulation"), "resources", "ros_control.urscript"]
   )
   input_recipe_filename = PathJoinSubstitution(
-      [FindPackageShare("ur_robot_driver"), "resources", "rtde_input_recipe.txt"]
+      [FindPackageShare("suii_manipulation"), "resources", "rtde_input_recipe.txt"]
   )
   output_recipe_filename = PathJoinSubstitution(
-      [FindPackageShare("ur_robot_driver"), "resources", "rtde_output_recipe.txt"]
+      [FindPackageShare("suii_manipulation"), "resources", "rtde_output_recipe.txt"]
   )
 
   robot_description_content = Command(
@@ -202,7 +202,7 @@ def generate_launch_description():
   robot_description = {"robot_description": robot_description_content}
 
   robot_controllers = PathJoinSubstitution(
-      [FindPackageShare(runtime_config_package), "config", controllers_file]
+      [FindPackageShare("suii_manipulation"), "config", controllers_file]
   )
 
   pkg_share = FindPackageShare(package='suii_manipulation').find('suii_manipulation')
