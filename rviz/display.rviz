@@ -7,6 +7,8 @@ Panels:
         - /Global Options1
         - /Status1
         - /RobotModel1
+        - /TF1
+        - /TF1/Frames1
       Splitter Ratio: 0.5
     Tree Height: 617
   - Class: rviz_common/Selection
@@ -71,11 +73,10 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        camera_placeholder:
+        container_1:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-          Value: true
         lidar_back:
           Alpha: 1
           Show Axes: false
@@ -94,19 +95,25 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        ur3/ee_link:
+        ur3/base_link_inertia:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
+        ur3/flange:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         ur3/forearm_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         ur3/shoulder_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         ur3/tool0:
           Alpha: 1
           Show Axes: false
@@ -115,18 +122,22 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         ur3/wrist_1_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         ur3/wrist_2_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         ur3/wrist_3_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+          Value: true
         wheel_left_back:
           Alpha: 1
           Show Axes: false
@@ -152,6 +163,87 @@ Visualization Manager:
       Update Interval: 0
       Value: true
       Visual Enabled: true
+    - Class: rviz_default_plugins/TF
+      Enabled: true
+      Frame Timeout: 15
+      Frames:
+        All Enabled: false
+        arm_placeholder:
+          Value: false
+        base_link:
+          Value: false
+        container_1:
+          Value: true
+        lidar_back:
+          Value: false
+        lidar_front:
+          Value: false
+        ur3/base:
+          Value: false
+        ur3/base_link:
+          Value: false
+        ur3/base_link_inertia:
+          Value: false
+        ur3/flange:
+          Value: false
+        ur3/forearm_link:
+          Value: false
+        ur3/shoulder_link:
+          Value: false
+        ur3/tool0:
+          Value: false
+        ur3/upper_arm_link:
+          Value: false
+        ur3/wrist_1_link:
+          Value: false
+        ur3/wrist_2_link:
+          Value: false
+        ur3/wrist_3_link:
+          Value: false
+        wheel_left_back:
+          Value: false
+        wheel_left_front:
+          Value: false
+        wheel_right_back:
+          Value: false
+        wheel_right_front:
+          Value: false
+      Marker Scale: 1
+      Name: TF
+      Show Arrows: true
+      Show Axes: true
+      Show Names: true
+      Tree:
+        base_link:
+          arm_placeholder:
+            ur3/base_link:
+              ur3/base:
+                container_1:
+                  {}
+              ur3/base_link_inertia:
+                ur3/shoulder_link:
+                  ur3/upper_arm_link:
+                    ur3/forearm_link:
+                      ur3/wrist_1_link:
+                        ur3/wrist_2_link:
+                          ur3/wrist_3_link:
+                            ur3/flange:
+                              ur3/tool0:
+                                {}
+          lidar_back:
+            {}
+          lidar_front:
+            {}
+          wheel_left_back:
+            {}
+          wheel_left_front:
+            {}
+          wheel_right_back:
+            {}
+          wheel_right_front:
+            {}
+      Update Interval: 0
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -210,10 +302,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.5453982949256897
+      Pitch: 0.6603981852531433
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 1.155397891998291
+      Yaw: 0.4503982663154602
     Saved: ~
 Window Geometry:
   Displays:
