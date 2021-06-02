@@ -1,1 +1,5 @@
 #define EXECUTION_RATE 10 // [Hz]
+
+// Define fixed arm poses
+const std::vector<double> drive_pose = {-1.5726707617389124, -0.2505281607257288, -2.4049914518939417,
+  -1.4284794966327112, 1.645344614982605, 0.002140682190656662};

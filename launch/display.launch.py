@@ -51,13 +51,6 @@ def generate_launch_description():
   )
   declared_arguments.append(
     DeclareLaunchArgument(
-      "controllers_file",
-      default_value="ur_controllers.yaml",
-      description="YAML file with the controllers configuration.",
-    )
-  )
-  declared_arguments.append(
-    DeclareLaunchArgument(
       "description_package",
       default_value="ur_description",
       description="Description package with robot URDF/XACRO files. Usually the argument \
@@ -113,15 +106,10 @@ def generate_launch_description():
   safety_pos_margin = "0.15"
   safety_k_position = "20"
   # General arguments
-  runtime_config_package = "ur_bringup"
-  controllers_file = "ur_controllers.yaml"
-  description_package = "ur_description"
   description_file = "suii_description.urdf.xacro"
   prefix = "ur3/"
   use_fake_hardware = LaunchConfiguration("use_fake_hardware")
   fake_sensor_commands = "false"
-  robot_controller = "joint_trajectory_controller"
-  launch_rviz = "false"
 
   joint_limit_params = PathJoinSubstitution(
       [FindPackageShare("suii_manipulation"), "config", "joint_limits.yaml"]
@@ -200,27 +188,8 @@ def generate_launch_description():
     )
 
   robot_description = {"robot_description": robot_description_content}
-
-  robot_controllers = PathJoinSubstitution(
-      [FindPackageShare("suii_manipulation"), "config", controllers_file]
-  )
-
   pkg_share = FindPackageShare(package='suii_manipulation').find('suii_manipulation')
-  #robot_path = os.path.join(pkg_share, 'urdf/suii_description.urdf.xacro')
-  #doc = xacro.process_file(robot_path)
-  #robot_description = {'robot_description': doc.toprettyxml(indent='  ')}
-
   rviz_config_path = os.path.join(pkg_share, 'rviz/display.rviz')
-
-  control_node = launch_ros.actions.Node(
-    package="controller_manager",
-    executable="ros2_control_node",
-    parameters=[robot_description, robot_controllers],
-    output={
-        "stdout": "screen",
-        "stderr": "screen",
-    },
-  )
 
   robot_state_publisher_node = launch_ros.actions.Node(
     package='robot_state_publisher',
@@ -229,9 +198,9 @@ def generate_launch_description():
   )
 
   joint_state_publisher_node = launch_ros.actions.Node(
-    package='joint_state_publisher',
+    package='suii_manipulation',
     executable='joint_state_publisher',
-    name='joint_state_publisher',
+    name='joint_state_publisher'
   )
 
   rviz_node = launch_ros.actions.Node(
@@ -241,53 +210,10 @@ def generate_launch_description():
     arguments=['-d', rviz_config_path]
   )
 
-  joint_state_broadcaster_spawner = launch_ros.actions.Node(
-    package="controller_manager",
-    executable="spawner.py",
-    arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
-  )
-
-  robot_controller_spawner = launch_ros.actions.Node(
-    package="controller_manager",
-    executable="spawner.py",
-    arguments=[robot_controller, "-c", "/controller_manager"],
-  )
-
-  io_and_status_controller_spawner = launch_ros.actions.Node(
-    package="controller_manager",
-    executable="spawner.py",
-    arguments=["io_and_status_controller", "-c", "/controller_manager"],
-  )
-    
-  speed_scaling_state_broadcaster_spawner = launch_ros.actions.Node(
-    package="controller_manager",
-    executable="spawner.py",
-    arguments=[
-      "speed_scaling_state_broadcaster",
-      "--controller-manager",
-      "/controller_manager",
-    ],
-  )
-
-  force_torque_sensor_broadcaster_spawner = launch_ros.actions.Node(
-    package="controller_manager",
-    executable="spawner.py",
-    arguments=[
-      "force_torque_sensor_broadcaster",
-      "--controller-manager",
-      "/controller_manager",
-    ],
-  )
-
   nodes_to_start = [
-        control_node,
         robot_state_publisher_node,
-        rviz_node,
-        joint_state_broadcaster_spawner,
-        io_and_status_controller_spawner,
-        speed_scaling_state_broadcaster_spawner,
-        force_torque_sensor_broadcaster_spawner,
-        robot_controller_spawner,
+        joint_state_publisher_node,
+        rviz_node
   ]
   
   return LaunchDescription(declared_arguments + nodes_to_start)

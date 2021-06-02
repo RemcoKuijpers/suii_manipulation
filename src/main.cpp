@@ -1,5 +1,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "config.h"
+#include "robotControl.h"
+#include <iostream>
 
 // Define states
 typedef enum {
@@ -15,10 +17,12 @@ int main(int argc, char **argv)
 {
     // Initialize ROS and create node
     rclcpp::init(argc, argv);
-    rclcpp::NodeOptions node_options;
-    node_options.automatically_declare_parameters_from_overrides(true);
-    auto node = rclcpp::Node::make_shared("Manipulation", node_options);
+    rclcpp::Node::SharedPtr node = rclcpp::Node::make_shared("manipulation");
     rclcpp::Rate r(EXECUTION_RATE);
+
+    // Initialize UR3 connection    
+    RobotControl ur3("192.168.178.71");
+    std::cout << "Is robot connected ? " << ur3.isRobotConnected() << std::endl;
 
     // Initialize state machine
     state_t state = move;
@@ -31,9 +35,17 @@ int main(int argc, char **argv)
                 break;
 
             case move:
+                ur3.closeGripper();
+                if (ur3.moveL({-0.143, -0.435, 0.20, -0.001, 3.12, 0.04}, 0.5, 0.2)){
+                    state = pick;
+                }
                 break;
 
             case pick:
+                ur3.openGripper();
+                if (ur3.moveJ(drive_pose, 0.5, 1)){
+                    state = move;
+                }
                 break;
 
             case place:
