@@ -50,7 +50,7 @@ def generate_launch_description():
     # choices=['ur3', 'ur3e', 'ur5', 'ur5e', 'ur10', 'ur10e', 'ur16e']))
     declared_arguments.append(
         DeclareLaunchArgument(
-            "robot_ip", default_value="localhost", description="IP address by which the robot can be reached."
+            "robot_ip", default_value="192.168.178.71", description="IP address by which the robot can be reached."
         )
     )
     declared_arguments.append(
@@ -108,7 +108,7 @@ def generate_launch_description():
     declared_arguments.append(
         DeclareLaunchArgument(
             "prefix",
-            default_value='""',
+            default_value='ur3/',
             description="Prefix of the joint names, useful for \
         multi-robot setup. If changed than also joint names in the controllers' configuration \
         have to be updated.",
@@ -135,7 +135,7 @@ def generate_launch_description():
 
     # Initialize Arguments
     ur_type = "ur3"
-    robot_ip = "localhost" #Set to ip of the real robot if you're using a real robot
+    robot_ip = LaunchConfiguration("robot_ip")
     safety_limits = "true"
     safety_pos_margin = "0.15"
     safety_k_position = "20"
@@ -145,7 +145,7 @@ def generate_launch_description():
     moveit_config_package = "suii_manipulation"
     moveit_config_file = "ur.srdf.xacro"
     prefix = "ur3/"
-    use_fake_hardware = "true"
+    use_fake_hardware = LaunchConfiguration("use_fake_hardware")
     fake_sensor_commands = "false"
     launch_rviz = "false"
 
@@ -347,20 +347,10 @@ def generate_launch_description():
         arguments=["0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "world", "base_link"],
     )
 
-    # MoveGroupInterface demo executable
-    run_move_group_demo = Node(
-        name="manipulation",
-        package="suii_manipulation",
-        executable="manipulation",
-        output="screen",
-        parameters=[robot_description, robot_description_semantic, kinematics_yaml],
-    )
-
     nodes_to_start = [
         move_group_node,
         mongodb_server_node,
         #rviz_node,
-        run_move_group_demo,
         static_tf,
     ]
 

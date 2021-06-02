@@ -1,6 +1,6 @@
 import launch
 from launch.launch_description import LaunchDescription
-from launch.substitutions import PathJoinSubstitution, Command, FindExecutable
+from launch.substitutions import PathJoinSubstitution, Command, FindExecutable, LaunchConfiguration
 from launch_ros.substitutions import FindPackageShare
 import launch_ros
 import launch.launch_description_sources
@@ -16,7 +16,7 @@ def generate_launch_description():
   )
   declared_arguments.append(
     DeclareLaunchArgument(
-      "robot_ip",default_value="localhost", description="IP address by which the robot can be reached."
+      "robot_ip",default_value="192.168.178.71", description="IP address by which the robot can be reached."
     )
   )
   declared_arguments.append(
@@ -74,7 +74,7 @@ def generate_launch_description():
   declared_arguments.append(
     DeclareLaunchArgument(
       "prefix",
-      default_value='""',
+      default_value='ur3/',
       description="Prefix of the joint names, useful for \
       multi-robot setup. If changed than also joint names in the controllers' configuration \
       have to be updated.",
@@ -108,7 +108,7 @@ def generate_launch_description():
 
   # Initialize Arguments
   ur_type = "ur3"
-  robot_ip = "localhost" #Set to ip of the real robot if you're using a real robot
+  robot_ip = LaunchConfiguration("robot_ip")
   safety_limits = "true"
   safety_pos_margin = "0.15"
   safety_k_position = "20"
@@ -118,7 +118,7 @@ def generate_launch_description():
   description_package = "ur_description"
   description_file = "suii_description.urdf.xacro"
   prefix = "ur3/"
-  use_fake_hardware = "true" #set to false when using real robot
+  use_fake_hardware = LaunchConfiguration("use_fake_hardware")
   fake_sensor_commands = "false"
   robot_controller = "joint_trajectory_controller"
   launch_rviz = "false"

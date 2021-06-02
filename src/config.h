@@ -1,1 +1,1 @@
-#define EXECUTION_RATE 20 // [Hz]
+#define EXECUTION_RATE 10 // [Hz]
