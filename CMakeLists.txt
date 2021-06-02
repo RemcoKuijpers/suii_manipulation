@@ -21,14 +21,10 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(moveit_common REQUIRED)
-find_package(moveit_ros_planning_interface REQUIRED)
-find_package(moveit_core REQUIRED)
-find_package(rosidl_default_runtime REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system)
 
 add_executable(main src/main.cpp)
-ament_target_dependencies(main rclcpp moveit_ros_planning_interface Boost)
+ament_target_dependencies(main rclcpp Boost)
 
 install(TARGETS
   main
@@ -49,7 +45,6 @@ endif()
 install(DIRECTORY
   launch
   urdf
-  srdf
   meshes
   rviz
   config
