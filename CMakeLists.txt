@@ -21,15 +21,17 @@ find_package(rclcpp REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system)
 find_package(ur_rtde REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(tf2_ros REQUIRED)
 
-add_executable(main src/main.cpp src/robotControl.cpp)
+add_executable(main src/main.cpp src/robotControl.cpp src/objectHandler.cpp)
 add_executable(joint_state_publisher src/joint_state_publisher.cpp)
 
 target_link_libraries(main ur_rtde::rtde)
 target_link_libraries(joint_state_publisher ur_rtde::rtde)
 
 
-ament_target_dependencies(main rclcpp Boost)
+ament_target_dependencies(main rclcpp tf2_ros Boost)
 ament_target_dependencies(joint_state_publisher rclcpp Boost sensor_msgs)
 
 install(TARGETS
