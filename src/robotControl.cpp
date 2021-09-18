@@ -13,6 +13,42 @@ bool RobotControl::moveJ(const std::vector<double> &q, double speed, double acce
     return robot.moveJ(q, speed, acceleration, async);
 }
 
+bool RobotControl::moveJ_IK(const std::vector<double> &pose, double speed, double acceleration, bool async){
+    return robot.moveJ_IK(pose, speed, acceleration, async);
+}
+
+bool RobotControl::pickObject(const std::string frame_name){
+    this->openGripper();
+    double roll, pitch, yaw;
+    std::vector<double> rotation;
+
+    tf2::Transform base_t;
+    tf2::Transform gripper_t;
+    tf2::Transform transform;
+    tf2::Quaternion q;
+    tf2::Vector3 translation;
+
+    base_t = this->object_handler.getTransform("ur3/base_link", frame_name);
+    gripper_t = this->object_handler.getTransform("gripper", "ur3/tool0");
+
+    transform.mult(base_t, gripper_t);
+    translation = transform.getOrigin();
+
+    q = transform.getRotation();
+    tf2::Matrix3x3 m(q);
+    m.getRPY(roll,pitch,yaw);
+
+    rotation = this->getRotation(round(100000*roll)/100000, round(100000*pitch)/100000, round(100000*(yaw+M_PI))/100000);
+
+    this->moveJ_IK({-translation.getX(), -translation.getY(), translation.getZ()+0.1, rotation[0], rotation[1], rotation[2]});
+
+    if (this->moveL({-translation.getX(), -translation.getY(), translation.getZ(), rotation[0], rotation[1], rotation[2]})){
+        this->closeGripper();
+    }
+    
+    return this->moveL({-translation.getX(), -translation.getY(), translation.getZ()+0.1, rotation[0], rotation[1], rotation[2]});
+}
+
 void RobotControl::openGripper(){
     io.setAnalogOutputVoltage(0, 0);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -21,4 +57,56 @@ void RobotControl::openGripper(){
 void RobotControl::closeGripper(){
     io.setAnalogOutputVoltage(0, 0.45);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
+}
+
+std::vector<double> RobotControl::getRotation(const double roll, const double pitch, const double yaw){
+    std::vector<double> rot;
+
+    double yawMatrix[3][3] = {
+        {cos(yaw), -sin(yaw), 0},
+        {sin(yaw), cos(yaw), 0},
+        {0, 0, 1}
+    };
+
+    double pitchMatrix[3][3] = {
+        {cos(pitch), 0, sin(pitch)},
+        {0, 1, 0},
+        {-sin(pitch), 0, cos(pitch)}
+    };
+
+    double rollMatrix[3][3] = {
+        {1, 0, 0},
+        {0, cos(roll), -sin(roll)},
+        {0, sin(roll), cos(roll)}
+    };
+
+    double R1[3][3];
+    double R[3][3];
+    
+    for (int i = 0; i < 3; i++){
+        for (int j = 0; j < 3; j++){
+            R1[i][j] = 0;
+            for (int u = 0; u < 3; u++){
+                R1[i][j] += yawMatrix[i][u] * pitchMatrix[u][j];
+            }
+        }
+    }
+    for (int i = 0; i < 3; i++){
+        for (int j = 0; j < 3; j++){
+            R[i][j] = 0;
+            for (int u = 0; u < 3; u++){
+                R[i][j] += R1[i][u] * rollMatrix[u][j];
+            }
+        }
+    }
+
+    double theta = acos(((R[0][0] + R[1][1] + R[2][2]) - 1) / 2);
+    double multi = 1 / (2 * sin(theta));
+    double rx = multi * (R[2][1] - R[1][2]) * theta;
+    double ry = multi * (R[0][2] - R[2][0]) * theta;
+    double rz = multi * (R[1][0] - R[0][1]) * theta;
+    rot.push_back(rx);
+    rot.push_back(ry);
+    rot.push_back(rz);
+    return rot;
 }

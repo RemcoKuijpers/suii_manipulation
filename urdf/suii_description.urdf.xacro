@@ -17,6 +17,7 @@
   <link name="container_1"/>
   <link name="container_2"/>
   <link name="container_3"/>
+  <link name="gripper"/>
 
   <joint name="containter_1_mount" type="fixed">
     <parent link="ur3/base" />
@@ -34,6 +35,12 @@
     <parent link="ur3/base" />
     <child link="container_3" />
     <origin xyz="0.142679287389 0.228439321043 0.0976393529311" rpy="0.0169812 0.0146731 1.0212226" />
+  </joint>
+
+  <joint name="gripper_joint" type="fixed">
+    <parent link="ur3/tool0" />
+    <child link="gripper" />
+    <origin xyz="0 0 0.2" rpy="${pi} 0 0" />
   </joint>
 
   <xacro:suii_base/>

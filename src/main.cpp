@@ -2,6 +2,7 @@
 #include "config.h"
 #include "robotControl.h"
 #include "objectHandler.h"
+#include <math.h>
 #include <iostream>
 
 // Define states
@@ -25,40 +26,46 @@ int main(int argc, char **argv)
     RobotControl ur3("192.168.178.71");
     std::cout << "Is robot connected ? " << ur3.isRobotConnected() << std::endl;
 
-    // Initialize object handler
     ObjectHandler object_handler;
 
     // Initialize state machine
-    state_t state = move;
+    state_t state = wait_for_service_call;
+
+    double object_translation1[3] = {0.5, 0.3, 0.15};
+    double object_rotation1[3] = {0, 0, M_PI_4};
+
+    double object_translation2[3] = {0.5, -0.4, 0.05};
+    double object_rotation2[3] = {0, 0, -0.5};
 
     while(rclcpp::ok()){
 
         switch(state) {
 
             case wait_for_service_call:
+                object_handler.setFrame("base_link", "OBJECT1", object_translation1, object_rotation1);
+                object_handler.setFrame("base_link", "OBJECT2", object_translation2, object_rotation2);
+                state = move;
                 break;
 
             case move:
-                ur3.closeGripper();
-                if (ur3.moveL({-0.143, -0.435, 0.20, -0.001, 3.12, 0.04}, 0.5, 0.2)){
-                    geometry_msgs::msg::Transform transform;
-                    transform = object_handler.getTransform("ur3/tool0", "container_5");
-                    std::cout << transform.translation.y << std::endl;
+                ur3.openGripper();
+                if(ur3.moveJ(drive_pose, 0.5, 1)){
                     state = pick;
                 }
                 break;
 
             case pick:
                 ur3.openGripper();
-                if (ur3.moveJ(drive_pose, 0.5, 1)){
-                    geometry_msgs::msg::Transform transform;
-                    transform = object_handler.getTransform("ur3/tool0", "container_3");
-                    std::cout << transform.translation.y << std::endl;
-                    state = move;
+                if (ur3.pickObject("OBJECT1")){
+                    state = place;
                 }
                 break;
 
             case place:
+                ur3.openGripper();
+                if (ur3.pickObject("OBJECT2")){
+                    state = move;
+                }
                 break;
 
             case done:
