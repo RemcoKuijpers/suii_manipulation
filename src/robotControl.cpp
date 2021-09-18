@@ -25,14 +25,20 @@ bool RobotControl::pickObject(const std::string frame_name){
     tf2::Transform base_t;
     tf2::Transform gripper_t;
     tf2::Transform transform;
+    tf2::Transform prePick;
+    tf2::Transform pre_t;
     tf2::Quaternion q;
     tf2::Vector3 translation;
+    tf2::Vector3 pre_translation;
 
     base_t = this->object_handler.getTransform("ur3/base_link", frame_name);
     gripper_t = this->object_handler.getTransform("gripper", "ur3/tool0");
+    prePick.setOrigin(tf2::Vector3(0, 0, -PREPICK_HEIGHT));
 
     transform.mult(base_t, gripper_t);
+    pre_t.mult(transform, prePick);
     translation = transform.getOrigin();
+    pre_translation = pre_t.getOrigin();
 
     q = transform.getRotation();
     tf2::Matrix3x3 m(q);
@@ -40,13 +46,13 @@ bool RobotControl::pickObject(const std::string frame_name){
 
     rotation = this->getRotation(round(100000*roll)/100000, round(100000*pitch)/100000, round(100000*(yaw+M_PI))/100000);
 
-    this->moveJ_IK({-translation.getX(), -translation.getY(), translation.getZ()+0.1, rotation[0], rotation[1], rotation[2]});
+    this->moveJ_IK({-pre_translation.getX(), -pre_translation.getY(), pre_translation.getZ(), rotation[0], rotation[1], rotation[2]});
 
     if (this->moveL({-translation.getX(), -translation.getY(), translation.getZ(), rotation[0], rotation[1], rotation[2]})){
         this->closeGripper();
     }
     
-    return this->moveL({-translation.getX(), -translation.getY(), translation.getZ()+0.1, rotation[0], rotation[1], rotation[2]});
+    return this->moveL({-pre_translation.getX(), -pre_translation.getY(), pre_translation.getZ(), rotation[0], rotation[1], rotation[2]});
 }
 
 void RobotControl::openGripper(){

@@ -32,7 +32,7 @@ int main(int argc, char **argv)
     state_t state = wait_for_service_call;
 
     double object_translation1[3] = {0.5, 0.3, 0.15};
-    double object_rotation1[3] = {0, 0, M_PI_4};
+    double object_rotation1[3] = {-0.6, -0.4, M_PI_4};
 
     double object_translation2[3] = {0.5, -0.4, 0.05};
     double object_rotation2[3] = {0, 0, -0.5};

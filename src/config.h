@@ -1,4 +1,5 @@
 #define EXECUTION_RATE 10 // [Hz]
+#define PREPICK_HEIGHT 0.1 // [m]
 
 // Define fixed arm poses
 const std::vector<double> drive_pose = {-1.5726707617389124, -0.2505281607257288, -2.4049914518939417,
