@@ -23,9 +23,6 @@ int main(int argc, char **argv)
 
     // Initialize UR3 connection    
     RobotControl ur3("192.168.178.71");
-    std::cout << "Is robot connected ? " << ur3.isRobotConnected() << std::endl;
-
-    ObjectHandler object_handler;
 
     // Initialize state machine
     state_t state = wait_for_service_call;
@@ -36,42 +33,35 @@ int main(int argc, char **argv)
     double object_translation2[3] = {0.5, -0.4, 0.05};
     double object_rotation2[3] = {0, 0, -0.5};
 
+    std::vector<std::string> items_to_pick = {"OBJECT1", "OBJECT2"};
+
     while(rclcpp::ok()){
 
         switch(state) {
 
             case wait_for_service_call:
-                object_handler.setFrame("base_link", "OBJECT1", object_translation1, object_rotation1);
-                object_handler.setFrame("base_link", "OBJECT2", object_translation2, object_rotation2);
+                ur3.object_handler.setFrame("base_link", "OBJECT1", object_translation1, object_rotation1);
+                ur3.object_handler.setFrame("base_link", "OBJECT2", object_translation2, object_rotation2);
                 state = move;
                 break;
 
             case move:
-                ur3.openGripper();
                 if(ur3.moveJ(drive_pose, 0.5, 1)){
                     state = pick;
                 }
                 break;
 
             case pick:
-                ur3.openGripper();
-                if (ur3.pickObject("OBJECT1")){
-                    state = place;
+                for(int i = 0; i<(int)items_to_pick.size(); i++){
+                    ur3.moveObject(items_to_pick[i], containers[i]);
                 }
+                state = wait_for_service_call;
                 break;
 
             case place:
-                ur3.openGripper();
-                if (ur3.pickObject("container_1")){
-                    state = done;
-                }
                 break;
 
             case done:
-                ur3.openGripper();
-                if (ur3.pickObject("OBJECT2")){
-                    state = move;
-                }
                 break;
         }
         r.sleep();
