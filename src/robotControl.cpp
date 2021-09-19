@@ -1,5 +1,4 @@
 #include "robotControl.h"
-#include "config.h"
 
 bool RobotControl::isRobotConnected(){
     return robot.isConnected();
@@ -17,6 +16,14 @@ bool RobotControl::moveJ_IK(const std::vector<double> &pose, double speed, doubl
     return robot.moveJ_IK(pose, speed, acceleration, async);
 }
 
+bool RobotControl::moveJ_Path(const std::vector<std::vector<double>> &path, bool async){
+    return robot.moveJ(path, async);
+}
+
+void RobotControl::disconnectRobot(){
+    robot.disconnect();
+}
+
 bool RobotControl::pickObject(const std::string frame_name){
     this->openGripper();
     double roll, pitch, yaw;
@@ -27,12 +34,14 @@ bool RobotControl::pickObject(const std::string frame_name){
     tf2::Transform transform;
     tf2::Transform prePick;
     tf2::Transform pre_t;
+    tf2::Transform tool0_t;
     tf2::Quaternion q;
     tf2::Vector3 translation;
     tf2::Vector3 pre_translation;
 
-    base_t = this->object_handler.getTransform("ur3/base_link", frame_name);
+    base_t = this->object_handler.getTransform("ur3/base", frame_name);
     gripper_t = this->object_handler.getTransform("gripper", "ur3/tool0");
+    tool0_t = this->object_handler.getTransform("ur3/base", "ur3/tool0");
     prePick.setOrigin(tf2::Vector3(0, 0, -PREPICK_HEIGHT));
 
     transform.mult(base_t, gripper_t);
@@ -44,15 +53,49 @@ bool RobotControl::pickObject(const std::string frame_name){
     tf2::Matrix3x3 m(q);
     m.getRPY(roll,pitch,yaw);
 
-    rotation = this->getRotation(round(100000*roll)/100000, round(100000*pitch)/100000, round(100000*(yaw+M_PI))/100000);
+    rotation = this->getRotation(round(100000*roll)/100000, round(100000*pitch)/100000, round(100000*(yaw))/100000);
 
-    this->moveJ_IK({-pre_translation.getX(), -pre_translation.getY(), pre_translation.getZ(), rotation[0], rotation[1], rotation[2]});
+    std::vector<std::vector<double>> path;
 
-    if (this->moveL({-translation.getX(), -translation.getY(), translation.getZ(), rotation[0], rotation[1], rotation[2]})){
+    if((tool0_t.getOrigin().getY() > 0 && base_t.getOrigin().getY() < 0) || (tool0_t.getOrigin().getY() < 0 && base_t.getOrigin().getY() > 0)){
+        std::vector<double> path_pose1;
+        for (int i = 0; i<(int)safety_pose.size(); i++){
+            path_pose1.push_back(safety_pose[i]);
+        }
+        path_pose1.push_back(JOINT_SPACE_SPEED);
+        path_pose1.push_back(JOINT_SPACE_ACCELERATION);
+        path_pose1.push_back(0.15); //Blend radius
+        std::vector<double> path_pose2 = robot.getInverseKinematics({pre_translation.getX(), pre_translation.getY(), pre_translation.getZ(), rotation[0], rotation[1], rotation[2]});
+        path_pose2.push_back(JOINT_SPACE_SPEED);
+        path_pose2.push_back(JOINT_SPACE_ACCELERATION);
+        path_pose2.push_back(0.05); //Blend radius
+        std::vector<double> path_pose3 = robot.getInverseKinematics({translation.getX(), translation.getY(), translation.getZ(), rotation[0], rotation[1], rotation[2]});
+        path_pose3.push_back(JOINT_SPACE_SPEED);
+        path_pose3.push_back(JOINT_SPACE_ACCELERATION);
+        path_pose3.push_back(0.0); //Blend radius
+        path.push_back(path_pose1);
+        path.push_back(path_pose2);
+        path.push_back(path_pose3);
+    }else{
+        std::vector<double> path_pose1 = robot.getInverseKinematics({pre_translation.getX(), pre_translation.getY(), pre_translation.getZ(), rotation[0], rotation[1], rotation[2]});
+        path_pose1.push_back(JOINT_SPACE_SPEED);
+        path_pose1.push_back(JOINT_SPACE_ACCELERATION);
+        path_pose1.push_back(0.05); //Blend radius
+        std::vector<double> path_pose2 = robot.getInverseKinematics({translation.getX(), translation.getY(), translation.getZ(), rotation[0], rotation[1], rotation[2]});
+        path_pose2.push_back(JOINT_SPACE_SPEED);
+        path_pose2.push_back(JOINT_SPACE_ACCELERATION);
+        path_pose2.push_back(0.0); //Blend radius
+        path.push_back(path_pose1);
+        path.push_back(path_pose2);
+    }
+
+
+    if (this->moveJ_Path(path)){
         this->closeGripper();
+        std::this_thread::sleep_for(std::chrono::milliseconds(GRIPPER_CLOSING_TIME-100));
     }
     
-    return this->moveL({-pre_translation.getX(), -pre_translation.getY(), pre_translation.getZ(), rotation[0], rotation[1], rotation[2]});
+    return this->moveL({pre_translation.getX(), pre_translation.getY(), pre_translation.getZ(), rotation[0], rotation[1], rotation[2]});
 }
 
 void RobotControl::openGripper(){

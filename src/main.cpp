@@ -1,5 +1,4 @@
 #include "rclcpp/rclcpp.hpp"
-#include "config.h"
 #include "robotControl.h"
 #include "objectHandler.h"
 #include <math.h>
@@ -63,17 +62,21 @@ int main(int argc, char **argv)
 
             case place:
                 ur3.openGripper();
-                if (ur3.pickObject("OBJECT2")){
-                    state = move;
+                if (ur3.pickObject("container_1")){
+                    state = done;
                 }
                 break;
 
             case done:
+                ur3.openGripper();
+                if (ur3.pickObject("OBJECT2")){
+                    state = move;
+                }
                 break;
         }
         r.sleep();
     }
-
+    ur3.disconnectRobot();
     rclcpp::shutdown();
     return 0;
 }

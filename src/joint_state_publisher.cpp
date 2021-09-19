@@ -23,7 +23,7 @@ int main(int argc, char **argv)
         rclcpp::spin_some(node);
         r.sleep();
     }
-
+    rtde_receive.disconnect();
     rclcpp::shutdown();
     return 0;
 }
