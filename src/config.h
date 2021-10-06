@@ -14,6 +14,6 @@ const std::vector<double> safety_pose = {0.2641944885253906, -1.149320427571432,
 
 const std::vector<double> q_near = {-M_PI_2, -1.919, -M_PI_2, -1.2217, M_PI_2, 0};
 
-const std::vector<std::string> containers = {"container_1", "container_2", "container_3"};
+//const std::vector<std::string> containers = {"container_1", "container_2", "container_3"};
 const double ZERO_TRANSLATION[3] = {0.0, 0.0, 0.0};
 const double ZERO_ROTATION[3] = {0.0, 0.0, 0.0};

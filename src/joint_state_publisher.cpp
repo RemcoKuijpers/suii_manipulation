@@ -11,7 +11,7 @@ int main(int argc, char **argv)
     rclcpp::Node::SharedPtr node = rclcpp::Node::make_shared("joint_state_publisher");
     rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr publisher = node->create_publisher<sensor_msgs::msg::JointState>("/joint_states", 10);
 
-    ur_rtde::RTDEReceiveInterface rtde_receive("192.168.178.71");
+    ur_rtde::RTDEReceiveInterface rtde_receive("192.168.150.129");
 
     while(rclcpp::ok()){
         std::vector<double> joint_positions = rtde_receive.getActualQ();

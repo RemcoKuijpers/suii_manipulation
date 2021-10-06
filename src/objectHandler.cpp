@@ -34,3 +34,29 @@ void ObjectHandler::setFrame(const std::string frame_id, const std::string child
 
     tf_publisher_->sendTransform(t);
 }
+
+std::string ObjectHandler::getEmptySpotOnRobot(){ //Loop over all transforms and check if the container_X frames are not used as parent frames.
+    std::vector<std::string> frame_names;
+    geometry_msgs::msg::TransformStamped transformStamped;
+    bool container_1_occupied = false;
+    bool container_2_occupied = false;
+    bool container_3_occupied = false;
+    std::string container_1 = "container_1";
+    std::string container_2 = "container_2";
+    std::string container_3 = "container_3";
+    tf2::Transform t1, t2, t3;
+
+    frame_names = this->tf_buffer_->getAllFrameNames();
+    for(int i = 0 ; i < (int)frame_names.size() ; i++){
+        t1 = this->getTransform(frame_names.at(i), container_1);
+        t2 = this->getTransform(frame_names.at(i), container_2);
+        t3 = this->getTransform(frame_names.at(i), container_3);
+        if((abs(t1.getOrigin().getX()) < 0.001) && frame_names.at(i) != container_1) container_1_occupied = true;
+        if((abs(t2.getOrigin().getX()) < 0.001) && frame_names.at(i) != container_2) container_2_occupied = true;
+        if((abs(t3.getOrigin().getX()) < 0.001) && frame_names.at(i) != container_3) container_3_occupied = true;
+    }
+    if(!container_1_occupied) return "container_1";
+    if(!container_2_occupied) return "container_2";
+    if(!container_3_occupied) return "container_3";
+    else return "None";
+}

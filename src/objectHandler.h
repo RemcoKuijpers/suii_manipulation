@@ -26,11 +26,13 @@ public:
 
     void setFrame(const std::string frame_id, const std::string child_frame_id, const double translation[3], const double rotation[3]);
     tf2::Transform getTransform(const std::string target_frame, const std::string source_frame);
+    std::string getEmptySpotOnRobot();
 
 private:
     std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
     std::shared_ptr<tf2_ros::TransformListener> transform_listener_{nullptr};
     std::shared_ptr<tf2_ros::StaticTransformBroadcaster> tf_publisher_;
+    std::vector<std::string> containers_[2];
 };
 
 #endif //objectHandler_H
