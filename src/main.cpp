@@ -24,7 +24,7 @@ int main(int argc, char **argv)
     rclcpp::Rate r(EXECUTION_RATE);
 
     // Initialize UR3 connection    
-    RobotControl ur3("192.168.150.129");
+    RobotControl ur3("192.168.178.71");
 
     // Initialize state machine
     state_t state = wait_for_service_call;
