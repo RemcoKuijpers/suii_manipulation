@@ -35,7 +35,7 @@ void ObjectHandler::setFrame(const std::string frame_id, const std::string child
     tf_publisher_->sendTransform(t);
 }
 
-std::string ObjectHandler::getEmptySpotOnRobot(){ //Loop over all transforms and check if the container_X frames are not used as parent frames.
+std::string ObjectHandler::getEmptySpotOnRobot(){
     std::vector<std::string> frame_names;
     geometry_msgs::msg::TransformStamped transformStamped;
     bool container_1_occupied = false;
