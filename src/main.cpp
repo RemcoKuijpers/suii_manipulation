@@ -64,7 +64,6 @@ int main(int argc, char **argv)
             case pick:
                 for(int i = 0; i<(int)items_to_pick.size(); i++){
                     std::string place_link = ur3.object_handler.getEmptySpotOnRobot();
-                    RCLCPP_INFO(node->get_logger(), place_link);
                     if(place_link != "None") ur3.moveObject(items_to_pick[i], place_link);
                     else RCLCPP_INFO(node->get_logger(), "No free spot on robot");
                 }
